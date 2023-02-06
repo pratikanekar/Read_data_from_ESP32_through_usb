@@ -1,11 +1,20 @@
 import serial
 from loguru import logger
 from time import sleep
+import os
 
 datas = [{"read_slave": f"01020000000879CC"},
          {"read_slave": f"02020000001079F5"}]
 # {"read_slave": f"0302000000107824"},
 # {"read_slave": f"0402000000107993"}]
+
+logger.add(
+    os.environ.get("LOG_PATH", os.getcwd() + '/logs') +
+    "/{time:YYYY-MM-DD}/{time:HH}/log.log",
+    level="INFO" if os.getenv("LOG_LEVEL") not in [
+        "DEBUG", "WARNING", "ERROR"] else os.getenv("LOG_LEVEL"),
+    rotation="1h"
+)
 
 serial_reader = serial.Serial(
     port='/dev/ttyUSB0',
@@ -35,9 +44,9 @@ def read_esp32_slaves():
                 except Exception as e:
                     logger.debug(f"Error on Data: {read_esp32}")
             else:
-                logger.debug(f"No Data Found")
-        except TimeoutError as e:
-            logger.error(f"Error occurred  slave_{i}:{e}")
+                logger.debug(f"No Data Received")
+        except serial.SerialTimeoutException:
+            logger.error(f"Error occurred  slave_{i}")
         except Exception as e:
             logger.error(f"Error occurred slave_{i}: {e}")
         finally:
