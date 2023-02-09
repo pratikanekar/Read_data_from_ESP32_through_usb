@@ -3,17 +3,17 @@ from loguru import logger
 from time import sleep
 import os
 
-datas = [{"read_slave": f"01020000000879CC"},
+datas = [{"read_slave": f"01020000001079C6"},
          {"read_slave": f"02020000001079F5"}]
 # {"read_slave": f"0302000000107824"},
 # {"read_slave": f"0402000000107993"}]
 
 logger.add(
     os.environ.get("LOG_PATH", os.getcwd() + '/logs') +
-    "/{time:YYYY-MM-DD}/{time:HH}/log.log",
+    "/{time:YYYY-MM-DD}/log.log",
     level="INFO" if os.getenv("LOG_LEVEL") not in [
         "DEBUG", "WARNING", "ERROR"] else os.getenv("LOG_LEVEL"),
-    rotation="1h"
+    rotation="1d"
 )
 
 serial_reader = serial.Serial(
@@ -51,7 +51,7 @@ def read_esp32_slaves():
             logger.error(f"Error occurred slave_{i}: {e}")
         finally:
             i = i + 1
-            sleep(0.3)
+            sleep(0.1)
 
 
 if __name__ == '__main__':
